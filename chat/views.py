@@ -2,19 +2,27 @@ from django.shortcuts import render, redirect
 from chat.models import Room, Message
 from django.http import HttpResponse, JsonResponse
 
-# Create your views here.
+# Home page
 def home(request):
     return render(request, 'home.html')
 
+# Room view
 def room(request, room):
     username = request.GET.get('username')
-    room_details = Room.objects.get(name=room)
+
+    # Try to get the room, if not found return empty context
+    try:
+        room_details = Room.objects.get(name=room)
+    except Room.DoesNotExist:
+        room_details = None
+
     return render(request, 'room.html', {
         'username': username,
         'room': room,
         'room_details': room_details
     })
 
+# Check if room exists, else create new
 def checkview(request):
     room = request.POST['room_name']
     username = request.POST['username']
@@ -26,17 +34,23 @@ def checkview(request):
         new_room.save()
         return redirect('/'+room+'/?username='+username)
 
+# Send message
 def send(request):
     message = request.POST['message']
     username = request.POST['username']
     room_id = request.POST['room_id']
 
-    new_message = Message.objects.create(value=message, user=username, room=room_id)
+    new_message = Message.objects.create(value=message, user=username, room_id=room_id)
     new_message.save()
     return HttpResponse('Message sent successfully')
 
+# Get messages
 def getMessages(request, room):
-    room_details = Room.objects.get(name=room)
+    try:
+        room_details = Room.objects.get(name=room)
+        messages = Message.objects.filter(room=room_details.id)
+        messages_list = list(messages.values())
+    except Room.DoesNotExist:
+        messages_list = []
 
-    messages = Message.objects.filter(room=room_details.id)
-    return JsonResponse({"messages":list(messages.values())})
+    return JsonResponse({"messages": messages_list})
