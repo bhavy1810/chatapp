@@ -9,12 +9,10 @@ def home(request):
 # Room view
 def room(request, room):
     username = request.GET.get('username')
-
-    # Try to get the room, if not found return empty context
     try:
         room_details = Room.objects.get(name=room)
     except Room.DoesNotExist:
-        room_details = None
+        room_details = None  # Room not found
 
     return render(request, 'room.html', {
         'username': username,
@@ -22,7 +20,7 @@ def room(request, room):
         'room_details': room_details
     })
 
-# Check if room exists, else create new
+# Check if room exists, else create it
 def checkview(request):
     room = request.POST['room_name']
     username = request.POST['username']
@@ -51,6 +49,6 @@ def getMessages(request, room):
         messages = Message.objects.filter(room=room_details.id)
         messages_list = list(messages.values())
     except Room.DoesNotExist:
-        messages_list = []
+        messages_list = []  # No messages if room doesn't exist
 
     return JsonResponse({"messages": messages_list})
