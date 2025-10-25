@@ -23,6 +23,7 @@ CSRF_TRUSTED_ORIGINS = ['https://chatapp-1-p4xs.onrender.com']
 
 # Application definition
 INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',  # ✅ For serving static files on Render 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -34,6 +35,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ For serving static files on Render 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -99,3 +101,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+ 
